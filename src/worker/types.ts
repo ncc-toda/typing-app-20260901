@@ -8,6 +8,7 @@ export type Problem = {
   opponentName: string;
   opponentMessage: string;
   replyText: string;
+  replyKana: string;
   sortOrder: number;
 };
 

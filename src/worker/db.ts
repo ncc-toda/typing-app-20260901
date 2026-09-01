@@ -6,6 +6,7 @@ export type ProblemRow = {
   opponent_name: string;
   opponent_message: string;
   reply_text: string;
+  reply_kana: string;
   sort_order: number;
 };
 
@@ -42,6 +43,7 @@ export function problemFromRow(row: ProblemRow): Problem {
     opponentName: row.opponent_name,
     opponentMessage: row.opponent_message,
     replyText: row.reply_text,
+    replyKana: row.reply_kana,
     sortOrder: row.sort_order,
   };
 }
@@ -49,7 +51,7 @@ export function problemFromRow(row: ProblemRow): Problem {
 export async function listProblems(db: D1Database, difficulty: Difficulty): Promise<Problem[]> {
   const result = await db
     .prepare(
-      `SELECT id, difficulty, opponent_name, opponent_message, reply_text, sort_order
+      `SELECT id, difficulty, opponent_name, opponent_message, reply_text, reply_kana, sort_order
 			 FROM problems
 			 WHERE difficulty = ?
 			 ORDER BY sort_order ASC`,

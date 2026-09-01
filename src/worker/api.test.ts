@@ -8,6 +8,7 @@ const sampleProblem: ProblemRow = {
   opponent_name: "田中",
   opponent_message: "レビューお願いします",
   reply_text: "確認します。",
+  reply_kana: "かくにんします。",
   sort_order: 1,
 };
 
@@ -111,6 +112,7 @@ test("problemFromRow が API 用のキャメルケースに変換する", () => 
     opponentName: "田中",
     opponentMessage: "レビューお願いします",
     replyText: "確認します。",
+    replyKana: "かくにんします。",
     sortOrder: 1,
   });
 });
