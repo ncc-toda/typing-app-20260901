@@ -25,5 +25,6 @@ Vite+ は Nix の Node を使う（`vp env off` / system-first）。managed Node
 
 ## 仕様
 
-- 正式仕様: `docs/specs/mvp.md`（整備中。当面は `docs/mvp-spec.md` と `docs/ui-ux-direction.md`）
+- 正式仕様: `docs/specs/mvp.md`
+- 受入: `docs/tasks/mvp_acceptance_checklist.md`
 - UI 原型: `prototypes/concept-a-chat.html`
