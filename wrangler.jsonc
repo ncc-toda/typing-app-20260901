@@ -12,4 +12,13 @@
     "directory": "./dist/client",
     "not_found_handling": "single-page-application",
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "reply-rush",
+      // 本番作成後に差し替える。ローカル D1 はこの ID がなくても動く。
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "./migrations",
+    },
+  ],
 }

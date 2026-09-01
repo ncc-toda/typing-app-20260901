@@ -2,6 +2,7 @@
 set shell := ["bash", "-cu"]
 
 db := "DB"
+export PATH := `printf '%s' "$PWD/node_modules/.bin:$PATH"`
 
 default:
     @just --list
