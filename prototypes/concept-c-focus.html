@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C案: タイピング集中型 — Reply Rush</title>
+  <style>
+    :root {
+      --blue: #1264a3;
+      --green: #2eb67d;
+      --red: #e01e5a;
+      --yellow: #ecb22e;
+      --purple: #611f69;
+      --text: #1d1c1d;
+      --text-muted: #616061;
+      --border: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", "Hiragino Sans", sans-serif; background: #f5f7fa; color: var(--text); }
+
+    .proto-bar {
+      background: #1a1a2e; color: white; padding: 0.5rem 1rem;
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem;
+    }
+    .proto-bar a { color: var(--yellow); }
+    .proto-tabs { display: flex; gap: 0.5rem; margin-left: auto; }
+    .proto-tabs button {
+      background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white;
+      padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem;
+    }
+    .proto-tabs button.active { background: var(--blue); border-color: var(--blue); }
+
+    .screen { display: none; min-height: calc(100vh - 40px); }
+    .screen.active { display: block; }
+
+    /* TITLE */
+    .title-screen {
+      min-height: calc(100vh - 40px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 2rem; background: white;
+    }
+    .title-logo { font-size: 2.25rem; font-weight: 800; color: var(--blue); margin-bottom: 0.25rem; }
+    .title-sub { color: var(--text-muted); margin-bottom: 2rem; }
+    .feature-list {
+      display: flex; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; justify-content: center;
+    }
+    .feature-item {
+      text-align: center; font-size: 0.85rem; color: var(--text-muted);
+    }
+    .feature-item .icon { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .difficulty-cards { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .diff-card {
+      background: #f8f9fb; border: 2px solid var(--border); border-radius: 10px;
+      padding: 1.25rem 1.5rem; width: 170px; text-align: center; cursor: pointer;
+    }
+    .diff-card.selected { border-color: var(--blue); background: #e8f4fc; }
+    .diff-card h3 { font-size: 0.95rem; }
+    .diff-card p { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .start-btn {
+      margin-top: 1.5rem; padding: 0.75rem 2rem;
+      background: var(--blue); color: white; border: none; border-radius: 8px;
+      font-weight: 600; cursor: pointer;
+    }
+
+    /* PLAY - Focus layout */
+    .play-screen { min-height: calc(100vh - 40px); display: flex; flex-direction: column; }
+    .play-topbar {
+      background: white; border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.5rem; display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.85rem;
+    }
+    .play-topbar .timer { font-weight: 700; color: var(--blue); }
+    .play-topbar .salary { color: var(--text-muted); }
+    .play-main {
+      flex: 1; display: grid; grid-template-columns: 280px 1fr; gap: 0;
+      max-width: 1200px; margin: 0 auto; width: 100%; padding: 1rem;
+    }
+    @media (max-width: 800px) { .play-main { grid-template-columns: 1fr; } }
+    .context-panel {
+      background: white; border-radius: 12px; padding: 1rem;
+      margin-right: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      height: fit-content;
+    }
+    .context-panel h4 { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; }
+    .context-msg {
+      font-size: 0.85rem; padding: 0.6rem; background: #fef5f7; border-radius: 8px;
+      margin-bottom: 0.5rem; border-left: 3px solid var(--red);
+    }
+    .context-msg .from { font-weight: 700; font-size: 0.75rem; color: var(--red); margin-bottom: 0.25rem; }
+    .typing-focus {
+      background: white; border-radius: 12px; padding: 1.5rem 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      display: flex; flex-direction: column;
+    }
+    .progress-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
+    }
+    .progress-header .pct { font-size: 0.85rem; font-weight: 700; color: var(--green); }
+    .char-progress {
+      height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin-bottom: 1.5rem;
+    }
+    .char-progress-fill { height: 100%; background: var(--green); width: 42%; border-radius: 4px; }
+    .japanese-large {
+      font-size: 1.35rem; line-height: 1.8; margin-bottom: 1rem; font-weight: 500;
+    }
+    .mention { color: var(--blue); font-weight: 600; }
+    .romaji-large {
+      font-family: "Consolas", "SF Mono", monospace;
+      font-size: 1.15rem; letter-spacing: 0.08em; line-height: 2;
+      padding: 1rem 1.25rem; background: #f8f9fb; border-radius: 10px;
+      border: 2px solid var(--border); margin-bottom: 1rem;
+    }
+    .romaji-large .done { color: var(--green); }
+    .romaji-large .current {
+      background: var(--yellow); color: #333; padding: 2px 4px; border-radius: 4px;
+      box-shadow: 0 0 0 2px var(--yellow);
+    }
+    .romaji-large .pending { color: #bbb; }
+    .feedback-row {
+      display: flex; gap: 1rem; flex-wrap: wrap; margin-top: auto;
+    }
+    .feedback-chip {
+      font-size: 0.8rem; padding: 0.4rem 0.75rem; border-radius: 8px;
+      background: #f0f0f0; display: flex; align-items: center; gap: 0.4rem;
+    }
+    .feedback-chip.warn { background: #fff3e0; color: #e65100; }
+    .feedback-chip.ok { background: #e8f5e9; color: #2e7d32; }
+    .key-hint {
+      margin-top: 1rem; padding: 0.75rem; background: #e3f2fd; border-radius: 8px;
+      font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .key-hint kbd {
+      background: white; border: 1px solid var(--border); padding: 0.2rem 0.5rem;
+      border-radius: 4px; font-family: inherit; font-weight: 700;
+    }
+
+    /* RESULT */
+    .result-screen {
+      min-height: calc(100vh - 40px); padding: 2rem;
+      max-width: 700px; margin: 0 auto;
+    }
+    .result-screen h2 { font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--blue); }
+    .result-highlight {
+      background: white; border-radius: 12px; padding: 1.5rem 2rem;
+      margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .salary-focus { font-size: 2.25rem; font-weight: 800; color: var(--blue); }
+    .salary-focus small { font-size: 1rem; font-weight: 600; color: var(--text-muted); }
+    .stats-inline { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .stats-inline div { text-align: center; }
+    .stats-inline .val { font-size: 1.25rem; font-weight: 700; }
+    .stats-inline .lbl { font-size: 0.7rem; color: var(--text-muted); }
+    .weak-preview {
+      background: white; border-radius: 12px; padding: 1.25rem;
+      margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .weak-preview h3 { font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--red); }
+    .weak-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .weak-tag {
+      background: #ffebee; color: var(--red); padding: 0.35rem 0.75rem;
+      border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+    }
+    .result-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .result-actions button {
+      padding: 0.65rem 1.25rem; border-radius: 8px; border: none;
+      font-weight: 600; cursor: pointer;
+    }
+    .btn-primary { background: var(--blue); color: white; }
+    .btn-secondary { background: white; border: 1px solid var(--border) !important; }
+
+    /* ANALYSIS */
+    .analysis-screen { padding: 2rem; max-width: 900px; margin: 0 auto; }
+    .analysis-screen h2 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+    .analysis-tabs {
+      display: flex; gap: 0.5rem; margin-bottom: 1.25rem;
+    }
+    .analysis-tabs button {
+      padding: 0.5rem 1rem; border: 1px solid var(--border); background: white;
+      border-radius: 8px; cursor: pointer; font-size: 0.85rem;
+    }
+    .analysis-tabs button.active { background: var(--blue); color: white; border-color: var(--blue); }
+    .analysis-table {
+      background: white; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .analysis-table table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .analysis-table th {
+      text-align: left; padding: 0.75rem 1rem; background: #f8f9fb;
+      font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;
+    }
+    .analysis-table td { padding: 0.75rem 1rem; border-top: 1px solid #f0f0f0; }
+    .analysis-table tr:hover { background: #fafafa; }
+    .rate-high { color: var(--red); font-weight: 700; }
+    .rate-mid { color: var(--yellow); font-weight: 600; }
+    kbd { background: #eee; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+  </style>
+</head>
+<body>
+  <nav class="proto-bar">
+    <strong>C案: タイピング集中型</strong>
+    <a href="index.html">← 比較一覧</a>
+    <div class="proto-tabs">
+      <button class="active" data-screen="title">タイトル</button>
+      <button data-screen="play">プレイ中</button>
+      <button data-screen="result">結果</button>
+      <button data-screen="analysis">分析</button>
+    </div>
+  </nav>
+
+  <section id="title" class="screen title-screen active">
+    <h1 class="title-logo">Reply Rush</h1>
+    <p class="title-sub">入力に集中。苦手を可視化して上達する。</p>
+    <div class="feature-list">
+      <div class="feature-item"><div class="icon">⌨</div>ローマ字ガイド</div>
+      <div class="feature-item"><div class="icon">📊</div>リアルタイム分析</div>
+      <div class="feature-item"><div class="icon">🎯</div>苦手キー特定</div>
+    </div>
+    <div class="difficulty-cards">
+      <div class="diff-card"><h3>初級</h3><p>短い返信</p></div>
+      <div class="diff-card selected"><h3>中級</h3><p>メンション・記号</p></div>
+      <div class="diff-card"><h3>上級</h3><p>複数行・技術用語</p></div>
+    </div>
+    <button class="start-btn">120秒プレイ開始</button>
+  </section>
+
+  <section id="play" class="screen play-screen">
+    <div class="play-topbar">
+      <span class="timer">⏱ 残り 87 秒</span>
+      <span>中級 | 返信 3/?</span>
+      <span class="salary">累計 ¥124,500</span>
+    </div>
+    <div class="play-main">
+      <aside class="context-panel">
+        <h4>チャット文脈</h4>
+        <div class="context-msg">
+          <div class="from">PM · #incidents</div>
+          <div><span class="mention">@channel</span> 本番で 500 エラー出てます。ログ見てもらえますか？</div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.75rem;">
+          💡 この返信で苦手になりやすい: <kbd>g</kbd> <kbd>n</kbd> <kbd>@</kbd>
+        </div>
+      </aside>
+      <main class="typing-focus">
+        <div class="progress-header">
+          <span>入力進捗</span>
+          <span class="pct">42%</span>
+        </div>
+        <div class="char-progress"><div class="char-progress-fill"></div></div>
+        <div class="japanese-large">
+          <span class="mention">@suzuki</span> さん、了解です。ログ確認します。Nginx のアクセスログ、もうカンファレンスルーム並みに長いですね。
+        </div>
+        <div class="romaji-large">
+          <span class="done">@suzukisan, ryoukai desu. log </span><span class="current">ka</span><span class="pending">kunin shimasu. Nginx no access log, mou conference room nami ni nagai desu ne.</span>
+        </div>
+        <div class="key-hint">次のキー: <kbd>k</kbd></div>
+        <div class="feedback-row">
+          <span class="feedback-chip ok">正確性 96.2%</span>
+          <span class="feedback-chip">CPM 312</span>
+          <span class="feedback-chip warn">ミス 3 — 直近: <kbd>g</kbd></span>
+          <span class="feedback-chip">連続 12</span>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <section id="result" class="screen result-screen">
+    <h2>プレイ結果</h2>
+    <div class="result-highlight">
+      <div>
+        <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.25rem;">ゲーム内年収</div>
+        <div class="salary-focus">¥387,200<small>/年</small></div>
+      </div>
+      <div class="stats-inline">
+        <div><div class="val">312</div><div class="lbl">CPM</div></div>
+        <div><div class="val">96.2%</div><div class="lbl">正確性</div></div>
+        <div><div class="val">14</div><div class="lbl">ミス</div></div>
+        <div><div class="val">47</div><div class="lbl">最大連続</div></div>
+      </div>
+    </div>
+    <div class="weak-preview">
+      <h3>今回のプレイで特に苦手だったキー</h3>
+      <div class="weak-tags">
+        <span class="weak-tag">g (13.5%)</span>
+        <span class="weak-tag">n (9.0%)</span>
+        <span class="weak-tag">; (8.7%)</span>
+        <span class="weak-tag">n→g (18.2%)</span>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="btn-primary">再プレイ</button>
+      <button class="btn-secondary">詳細分析へ</button>
+    </div>
+  </section>
+
+  <section id="analysis" class="screen analysis-screen">
+    <h2>タイピング分析</h2>
+    <div class="analysis-tabs">
+      <button class="active">苦手キー</button>
+      <button>苦手な指</button>
+      <button>苦手な動き</button>
+    </div>
+    <div class="analysis-table">
+      <table>
+        <thead>
+          <tr><th>キー</th><th>入力回数</th><th>ミス回数</th><th>ミス率</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>g</kbd></td><td>89</td><td>12</td><td class="rate-high">13.5%</td></tr>
+          <tr><td><kbd>n</kbd></td><td>156</td><td>14</td><td class="rate-high">9.0%</td></tr>
+          <tr><td><kbd>;</kbd></td><td>23</td><td>2</td><td class="rate-mid">8.7%</td></tr>
+          <tr><td><kbd>@</kbd></td><td>34</td><td>2</td><td class="rate-mid">5.9%</td></tr>
+          <tr><td><kbd>#</kbd></td><td>18</td><td>1</td><td>5.6%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-muted);margin-top:1rem;">累積 12 プレイ分のデータ</p>
+  </section>
+
+  <script>
+    document.querySelectorAll('.proto-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.proto-tabs button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.screen).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

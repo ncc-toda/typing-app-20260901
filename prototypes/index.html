@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI比較 — Reply Rush プロトタイプ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: #f8f9fc;
+      color: #1a1a2e;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #611f69 0%, #1264a3 50%, #2eb67d 100%);
+      color: white;
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .header p { opacity: 0.95; font-size: 1rem; }
+    .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
+    .intro {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .intro h2 { font-size: 1.1rem; margin-bottom: 0.75rem; color: #611f69; }
+    .intro ul { margin-left: 1.25rem; }
+    .intro li { margin: 0.35rem 0; }
+    .cards { display: grid; gap: 1.5rem; }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.75rem 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border-left: 5px solid;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    .card-a { border-color: #611f69; }
+    .card-b { border-color: #e01e5a; }
+    .card-c { border-color: #1264a3; }
+    .card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+    .card .tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+    .card-a .tag { background: #f4ecf7; color: #611f69; }
+    .card-b .tag { background: #fce4ec; color: #e01e5a; }
+    .card-c .tag { background: #e3f2fd; color: #1264a3; }
+    .card p { color: #555; margin-bottom: 1rem; font-size: 0.95rem; }
+    .card ul { margin: 0 0 1.25rem 1.25rem; font-size: 0.9rem; color: #666; }
+    .card a {
+      display: inline-block;
+      padding: 0.6rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .card-a a { background: #611f69; color: white; }
+    .card-b a { background: #e01e5a; color: white; }
+    .card-c a { background: #1264a3; color: white; }
+    .criteria {
+      margin-top: 2rem;
+      padding: 1.25rem 1.5rem;
+      background: #fff9e6;
+      border-radius: 10px;
+      border: 1px solid #ffc107;
+    }
+    .criteria h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+    .criteria p { font-size: 0.9rem; color: #666; }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #888;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Reply Rush — UI/UX 比較</h1>
+    <p><strong>採用確定: A案（チャット没入型）</strong> — 参考用に 3 案を残しています</p>
+  </header>
+
+  <div class="container">
+    <section class="intro">
+      <h2>比較の進め方</h2>
+      <ul>
+        <li>各案を開き、画面上部のタブで「タイトル」「プレイ中」「結果」「分析」を切り替えてください</li>
+        <li>同じ文面・同じ状態で比較できるよう、コンテンツは全案共通です</li>
+        <li>配色の違いではなく、<strong>情報の優先順位</strong>の違いを確認してください</li>
+      </ul>
+    </section>
+
+    <div class="cards">
+      <article class="card card-a">
+        <span class="tag">A案</span>
+        <h3>チャット没入型</h3>
+        <p>Slack 風の会話を主役に。ゲーム情報（年収・残り時間）は控えめに配置し、仕事のチャットに返信している没入感を優先。</p>
+        <ul>
+          <li>強み: 世界観との一致、没入感</li>
+          <li>弱み: スコアの爽快感は控えめ</li>
+        </ul>
+        <a href="concept-a-chat.html">A案を開く →</a>
+      </article>
+
+      <article class="card card-b">
+        <span class="tag">B案</span>
+        <h3>ポップ・アーケード型</h3>
+        <p>年収・残り時間・コンボ・達成演出を大きく表示。寿司打のような「稼いでいく爽快感」を前面に出す。</p>
+        <ul>
+          <li>強み: スコアの見えやすさ、リプレイ欲</li>
+          <li>弱み: チャット感はやや薄れる</li>
+        </ul>
+        <a href="concept-b-arcade.html">B案を開く →</a>
+      </article>
+
+      <article class="card card-c">
+        <span class="tag">C案</span>
+        <h3>タイピング集中型</h3>
+        <p>入力対象・進捗・キー判定・学習フィードバックを主役に。練習効果と正確性向上を優先。</p>
+        <ul>
+          <li>強み: 入力への集中、分析との連動</li>
+          <li>弱み: チャットの世界観は補助的</li>
+        </ul>
+        <a href="concept-c-focus.html">C案を開く →</a>
+      </article>
+    </div>
+
+    <section class="criteria">
+      <h3>判断軸（選定時に意識してください）</h3>
+      <p>没入感 / 爽快感 / 入力への集中 / 情報の見つけやすさ / 世界観との一致 — 5 項目で各案を比較し、採用案または組み合わせたい要素を教えてください。</p>
+    </section>
+  </div>
+
+  <footer>
+    <p>MVP 仕様: docs/mvp-spec.md | 技術選定は本プロトタイプのスコープ外</p>
+  </footer>
+</body>
+</html>
